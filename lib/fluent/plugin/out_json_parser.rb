@@ -34,8 +34,17 @@ class Fluent::ParserOutput < Fluent::Output
             t ||= time
 
             r = @reserve_data ? record.merge(values) : values 
+            r.each do |key, value|
+                if value.is_a?(Hash)
+                    value.each do |k, v|
+                        record[k] = v
+                    end
+                else
+                    record[key] = value
+                end
+            end
             if r
-                Fluent::Engine.emit(tag,t,r)
+                Fluent::Engine.emit(tag,t,record)
             end
         end
 
